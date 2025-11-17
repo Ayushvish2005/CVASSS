@@ -1,16 +1,127 @@
+# 🌀 **Optical Flow Estimation: Lucas–Kanade & Horn–Schunck**
 
+This Python project implements and visualizes **two classical optical flow algorithms**:
 
-# 🌀 Optical Flow Estimation: Lucas–Kanade & Horn–Schunck
+* **Lucas–Kanade (LK)** — Local optical flow estimation using least squares
+* **Horn–Schunck (HS)** — Global optical flow estimation using smoothness regularization
 
-This Python project implements and visualizes two classical **optical flow algorithms from first principles**:
-
-* **Lucas–Kanade (LK)** — A *local* optical flow method using least-squares in small windows.
-* **Horn–Schunck (HS)** — A *global* optical flow method using energy minimization with smoothness constraints.
-
-Both methods operate on two consecutive image frames and produce two types of visualizations:
+Both methods operate on **two consecutive image frames** and generate motion field visualizations using:
 
 * **HSV color-encoded optical flow**
 * **Quiver (vector) plots**
+
+This project is ideal for **Computer Vision labs**, **assignments**, and **motion analysis experiments**.
+
+---
+
+## 📘 **Algorithms Implemented**
+
+### **1. Lucas–Kanade (Local Method)**
+
+A local optical flow technique assuming that motion is constant within a small neighborhood.
+
+**Key Idea:**
+Solve the optical flow constraint equation using **least squares over a window**.
+
+**Pros**
+
+* Simple and fast
+* Works well on textured regions
+* Good for corners (Harris, Shi-Tomasi)
+
+**Cons**
+
+* Fails on flat regions (aperture problem)
+* Sensitive to large motion unless pyramids are used
+
+---
+
+### **2. Horn–Schunck (Global Method)**
+
+A dense, global method that minimizes a combined **brightness constancy** and **smoothness** energy functional.
+
+**Pros**
+
+* Produces globally smooth flow
+* Works better in texture-less areas
+
+**Cons**
+
+* Can oversmooth object boundaries
+* Higher computational cost (iterative)
+
+---
+
+## 📦 **Requirements**
+
+Install dependencies:
+
+```bash
+pip install opencv-python numpy matplotlib
+```
+
+Required libraries:
+
+* **OpenCV**
+* **NumPy**
+* **Matplotlib**
+
+---
+
+## 🚀 **How to Run**
+
+The script requires **two sequential image frames**.
+
+### **Syntax**
+
+```bash
+python3 main.py --images <image1_path> <image2_path> [--method <lk|hs>]
+```
+
+### **Arguments**
+
+| Argument   | Description                                                  |
+| ---------- | ------------------------------------------------------------ |
+| `--images` | **(Required)** Path to frame 1 and frame 2                   |
+| `--method` | Optical flow algorithm to use (`lk` or `hs`) — default: `lk` |
+
+---
+
+## 📝 **Examples**
+
+### **Lucas–Kanade Optical Flow**
+
+```bash
+python3 main.py --images frame10.png frame11.png --method lk
+```
+
+### **Horn–Schunck Optical Flow**
+
+```bash
+python3 main.py --images frame10.png frame11.png --method hs
+```
+
+---
+
+## 📊 **Output Visualizations**
+
+Running the script displays a Matplotlib window with two subplots:
+
+### **1. Optical Flow (HSV)**
+
+* **Hue → motion direction**
+* **Brightness → motion magnitude**
+* Black = no motion
+* Smooth gradients = consistent motion
+
+### **2. Quiver Plot**
+
+* Displays motion vectors as arrows
+* Arrow direction = flow direction
+* Arrow length = flow magnitude
+* Overlaid on the original input frame
+
+This provides a clear, intuitive understanding of the motion between the two frames.
 
 ### Using The Lucas–Kanade Method
 
@@ -22,249 +133,53 @@ Both methods operate on two consecutive image frames and produce two types of vi
 ![alt text](hs.png)
 
 
----
-
-## 📘 Algorithms Implemented
 
 ---
 
-### **1. Lucas–Kanade (Local Method)**
+## 📁 **Project Structure**
 
-A local optical flow method assuming constant motion inside a neighborhood (e.g., a (7 \times 7) window).
+```
+├── main.py               # Main script (Lucas-Kanade + Horn-Schunck)
+├── frame10.png           # Example input image (optional)
+├── frame11.png           # Example input image (optional)
+├── README.md             # Documentation
+```
 
-#### **Key Idea**
+---
 
-Solve the optical flow constraint equation:
+## 🧠 **Theory (Brief)**
+
+Optical flow solves:
 
 [
 I_x u + I_y v + I_t = 0
 ]
 
-over all pixels in the window using **least squares**.
+Where
 
-#### **Pros**
+* (I_x), (I_y) → spatial gradients
+* (I_t) → temporal gradient
+* (u, v) → horizontal and vertical motion
 
-* Simple and computationally fast
-* Works well on textured regions and corners
-* Robust to noise within the window
+Both LK and HS rely on assumptions:
 
-#### **Cons**
-
-* Fails on flat, texture-less regions (aperture problem)
-* Sensitive to large motion unless pyramids are used
+* **Brightness constancy**
+* **Spatial smoothness of motion**
 
 ---
 
-### **2. Horn–Schunck (Global Method)**
+## 🎓 **Use Cases**
 
-A dense optical flow method that computes a smooth motion vector ((u, v)) for every pixel.
-
-#### **Key Idea**
-
-Minimize a global energy functional:
-
-[
-E = \iint \left( (I_x u + I_y v + I_t)^2 + \alpha^2 (|\nabla u|^2 + |\nabla v|^2) \right) dx,dy
-]
-
-#### **Pros**
-
-* Produces a globally smooth and dense flow field
-* Works well in texture-less areas
-
-#### **Cons**
-
-* Can oversmooth sharp motion boundaries
-* Higher computational cost due to iterative updates
+* Computer Vision Lab Assignments
+* Motion Tracking
+* Video Stabilization
+* Robot Navigation
+* Optical Flow Learning
 
 ---
 
-## 🧠 Core Mathematical Concepts
+## 🤝 **Contributions**
 
-Optical flow relies on the **Brightness Constancy** assumption:
-
-[
-I(x, y, t) \approx I(x + dx, y + dy, t + dt)
-]
-
-Using a first-order Taylor expansion, we obtain the **Optical Flow Constraint Equation**:
-
-[
-I_x u + I_y v + I_t = 0
-]
-
-This is *one equation with two unknowns*, so additional assumptions are required.
-
----
-
-### **Lucas–Kanade: Least-Squares Solution**
-
-LK assumes ((u, v)) are constant inside an (N \times N) window, giving an overdetermined system:
-
-[
-A
-\begin{bmatrix}
-u \
-v
-\end{bmatrix} = -b
-]
-
-Where:
-
-[
-A =
-\begin{bmatrix}
-I_{x_1} & I_{y_1} \
-I_{x_2} & I_{y_2} \
-\vdots & \vdots
-\end{bmatrix},
-\quad
-b =
-\begin{bmatrix}
-I_{t_1}  \
-I_{t_2}  \
-\vdots
-\end{bmatrix}
-]
-
-Solution:
-
-[
-\begin{bmatrix}
-u \
-v
-\end{bmatrix}
-=============
-
--(A^T A)^{-1} (A^T b)
-]
-
-This is exactly what the `lucas_kanade()` function computes.
-
----
-
-### **Horn–Schunck: Global Energy Minimization**
-
-The HS method minimizes:
-
-[
-E = (I_x u + I_y v + I_t)^2 + \alpha^2 (|\nabla u|^2 + |\nabla v|^2)
-]
-
-Using calculus of variations, we obtain the iterative update equations:
-
-[
-u^{k+1} = \bar u^k - I_x \frac{I_x \bar u^k + I_y \bar v^k + I_t}{\alpha^2 + I_x^2 + I_y^2}
-]
-
-[
-v^{k+1} = \bar v^k - I_y \frac{I_x \bar u^k + I_y \bar v^k + I_t}{\alpha^2 + I_x^2 + I_y^2}
-]
-
-Where (\bar u), (\bar v) are neighborhood averages (smoothed using a 4-connected kernel).
-
-This is precisely what `horn_schunck()` implements.
-
----
-
-## 📦 Requirements
-
-Install dependencies:
-
-```bash
-pip install opencv-python numpy matplotlib
-```
-
-Required libraries:
-
-* **OpenCV (cv2)** — for gradients and image loading
-* **NumPy** — numerical operations
-* **Matplotlib** — visualizations
-
----
-
-## 🚀 How to Run
-
-The script requires two sequential frames as input.
-
-### **Syntax**
-
-```bash
-python3 main.py --images <image1_path> <image2_path> [--method <lk|hs>]
-```
-
-### **Arguments**
-
-| Argument   | Description                                                   |
-| ---------- | ------------------------------------------------------------- |
-| `--images` | **(Required)** Path to the two input images (frame1, frame2). |
-| `--method` | Which algorithm to run: `lk` (default) or `hs`.               |
-
----
-
-## 📝 Examples
-
-### **Lucas–Kanade (Default)**
-
-```bash
-python3 main.py --images frame10.png frame11.png
-```
-
-OR explicitly:
-
-```bash
-python3 main.py --images frame10.png frame11.png --method lk
-```
-
-### **Horn–Schunck**
-
-```bash
-python3 main.py --images frame10.png frame11.png --method hs
-```
-
----
-
-## 📊 Output Visualizations
-
-On execution, a Matplotlib window appears with two plots:
-
-### **1. Optical Flow (HSV)**
-
-* **Hue (color):** Motion direction
-* **Value (brightness):** Motion magnitude
-* **Black:** No motion
-
-### **2. Quiver Plot**
-
-* Arrows represent motion direction
-* Arrow length represents magnitude
-* Overlaid on grayscale frame
-
-### Example Output (Lucas–Kanade)
-
-*(Insert your provided image here if desired)*
-
----
-
-## 📁 Project Structure
-
-```
-.
-├── main.py               # Main script: Lucas-Kanade + Horn-Schunck
-├── frame10.png           # Example input frame (optional)
-├── frame11.png           # Example input frame (optional)
-└── README.md             # Documentation
-```
-
----
-
-## 🎓 Use Cases
-
-* Computer Vision lab assignments
-* Motion estimation in videos
-* Object tracking
-* Visual odometry
-* Video stabilization
-* Learning classical optical flow
+Feel free to open issues or submit pull requests!
 
 ---
